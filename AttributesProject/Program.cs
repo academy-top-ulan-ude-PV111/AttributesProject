@@ -2,12 +2,28 @@
 
 namespace AttributesProject
 {
+    class NumberStringAttribute : ValidationAttribute
+    {
+        public override bool IsValid(object? value)
+        {
+            if(value is string valueString)
+            {
+                if (valueString!.All(ch => ch >= '0' && ch <= '9'))
+                    return true;
+                else
+                    ErrorMessage = "Строка не представляет целое число";
+            }
+            return false;
+        }
+    }
+
     class Employe
     {
         public string? Name { set; get; }
         public int Age { set; get; }
 
-        [RegularExpression(@"\+[1-9] \(\d{3}\) \d{3}-\d{2}-\d{2}", ErrorMessage = "Неправильный телефон")]
+        [RegularExpression(@"\+[1-9] \(\d{3}\) \d{3}-\d{2}-\d{2}", 
+            ErrorMessage = "Неправильный телефон")]
         public string? Phone { set; get; }
         
         [Required]
@@ -16,11 +32,15 @@ namespace AttributesProject
         [Required]
         [Compare("Password")]
         public string ConfirmPassword { set; get; }
+
+        [NumberString]
+        public string? NumberStr { set; get; }
         public Employe(string? name, int age, string? phone)
         {
             Name = name;
             Age = age;
             Phone = phone;
+            NumberStr = "12345";
         }
     }
     internal class Program
@@ -30,6 +50,7 @@ namespace AttributesProject
             string name = "Bob";
             string phone = "+7 (999) 1123-45-67";
             int age = 19;
+
 
             Employe employe = new Employe(name, age, phone);
             ValidationContext context = new(employe);
